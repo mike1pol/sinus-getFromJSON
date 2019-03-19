@@ -76,8 +76,8 @@ registerPlugin({
         var resData = JSON.parse(res.data);
         for (var i = 0; i < data.length; i++) {
           var ch = data[i];
-          var cn = get(resData, ch.path) || 0;
-          if (ch.channel && backend.getChannelByID(ch.channel)) {
+          var cn = get(resData, ch.path) || false;
+          if (ch && ch.channel && backend.getChannelByID(ch.channel)) {
             backend.getChannelByID(ch.channel).setName(ch.title + ' ' + cn.toString());
           }
         }

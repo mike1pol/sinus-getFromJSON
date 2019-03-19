@@ -1,8 +1,9 @@
 registerPlugin({
   name: 'Information from JSON',
-  version: '1.0',
+  version: '1.1',
   description: 'Get information from JSON and set to channel',
   author: 'Mike Pol',
+  requiredModules: ['http'],
   vars: [
     {
       name: 'int',
@@ -13,7 +14,7 @@ registerPlugin({
       name: 'url',
       title: 'Server info url',
       type: 'string',
-      placeholder: 'default: https://lk.rimasrp.ru/api/gov'
+      placeholder: 'insert JSON url like http://host/myjson'
     },
     {
       name: 'data',
@@ -61,9 +62,10 @@ registerPlugin({
     return (index && index == length) ? object : undefined;
   }
 
+  var http = require('http');
   var backend = require('backend');
-  function getInfo() {
-    sinusbot.http({
+  setInterval(function () {
+    http.simpleRequest({
       method: 'GET',
       timeout: 60000,
       url: url
@@ -76,21 +78,13 @@ registerPlugin({
         var resData = JSON.parse(res.data);
         for (var i = 0; i < data.length; i++) {
           var ch = data[i];
-          var cn = get(resData, ch.path) || false;
-          if (ch && ch.channel && backend.getChannelByID(ch.channel)) {
+          var cn = get(resData, ch.path) || 0;
+          if (ch.channel && backend.getChannelByID(ch.channel)) {
             backend.getChannelByID(ch.channel).setName(ch.title + ' ' + cn.toString());
           }
         }
       }
       console.log('All channels updated');
     });
-
-  }
-  setTimeout(function () {
-    getInfo();
-  }, 1000 * 10)
-  setInterval(function () {
-    console.log('Start updating channels');
-    getInfo();
   }, 60000 * int);
 });
